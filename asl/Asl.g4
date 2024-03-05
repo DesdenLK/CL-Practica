@@ -46,13 +46,18 @@ declarations
         ;
 
 variable_decl
-        : VAR ID ':' type
+        : VAR ID (COMMA variable_decl)* ':' (datastrucure_decl|type)
         ;
 
-type    : INT
+type    
+        : INT
         | FLOAT
         | CHAR
         | BOOL
+        ;
+
+datastrucure_decl   
+        : ARRAY LSBRACKET INTVAL RSBRACKET OF type
         ;
 
 statements
@@ -102,13 +107,13 @@ ident   : ID
 /// Lexer Rules
 //////////////////////////////////////////////////
 
-ASSIGN    : '=' ;
 EQUAL     : '==' ;
 NEQ       : '!=';
 G         : '>';
 L         : '<';
 GE        : '>=';
 LE        : '<=';
+ASSIGN    : '=' ;
 PLUS      : '+' ;
 MINUS     : '-';
 MUL       : '*';
@@ -128,10 +133,15 @@ FUNC      : 'func' ;
 ENDFUNC   : 'endfunc' ;
 READ      : 'read' ;
 WRITE     : 'write' ;
+ARRAY     : 'array';
+LSBRACKET : '[';
+RSBRACKET : ']';
+OF        : 'of';
 INTVAL    : ('0'..'9')+ ;
 FLOATVAL  : ('0'..'9')+'.'('0'..'9')+;
-CHARVAL   : [']('a'..'z'|'A'..'Z'|'_'|'0'..'9')['];
+CHARVAL   : [']('a'..'z'|'A'..'Z'|'_'|'0'..'9'|'\n'|'\t'|'\'')['];
 BOOLVAL   : ('true'|'false');
+COMMA     : ',';
 ID        : ('a'..'z'|'A'..'Z') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')* ;
 
 // Strings (in quotes) with escape sequences

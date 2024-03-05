@@ -1,5 +1,5 @@
 
-// Generated from Asl.g4 by ANTLR 4.9.2
+// Generated from Asl.g4 by ANTLR 4.7.2
 
 #pragma once
 
@@ -12,15 +12,16 @@
 class  AslLexer : public antlr4::Lexer {
 public:
   enum {
-    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, ASSIGN = 5, EQUAL = 6, NEQ = 7, 
-    G = 8, L = 9, GE = 10, LE = 11, PLUS = 12, MINUS = 13, MUL = 14, DIV = 15, 
+    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, EQUAL = 5, NEQ = 6, G = 7, L = 8, 
+    GE = 9, LE = 10, ASSIGN = 11, PLUS = 12, MINUS = 13, MUL = 14, DIV = 15, 
     AND = 16, OR = 17, VAR = 18, INT = 19, FLOAT = 20, CHAR = 21, BOOL = 22, 
     IF = 23, THEN = 24, ELSE = 25, ENDIF = 26, FUNC = 27, ENDFUNC = 28, 
-    READ = 29, WRITE = 30, INTVAL = 31, FLOATVAL = 32, CHARVAL = 33, BOOLVAL = 34, 
-    ID = 35, STRING = 36, COMMENT = 37, WS = 38
+    READ = 29, WRITE = 30, ARRAY = 31, LSBRACKET = 32, RSBRACKET = 33, OF = 34, 
+    INTVAL = 35, FLOATVAL = 36, CHARVAL = 37, BOOLVAL = 38, COMMA = 39, 
+    ID = 40, STRING = 41, COMMENT = 42, WS = 43
   };
 
-  explicit AslLexer(antlr4::CharStream *input);
+  AslLexer(antlr4::CharStream *input);
   ~AslLexer();
 
   virtual std::string getGrammarFileName() const override;

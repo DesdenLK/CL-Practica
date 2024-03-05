@@ -1,5 +1,5 @@
 
-// Generated from Asl.g4 by ANTLR 4.9.2
+// Generated from Asl.g4 by ANTLR 4.7.2
 
 #pragma once
 
@@ -29,6 +29,8 @@ public:
 
     virtual antlrcpp::Any visitType(AslParser::TypeContext *context) = 0;
 
+    virtual antlrcpp::Any visitDatastrucure_decl(AslParser::Datastrucure_declContext *context) = 0;
+
     virtual antlrcpp::Any visitStatements(AslParser::StatementsContext *context) = 0;
 
     virtual antlrcpp::Any visitAssignStmt(AslParser::AssignStmtContext *context) = 0;
@@ -45,9 +47,9 @@ public:
 
     virtual antlrcpp::Any visitLeft_expr(AslParser::Left_exprContext *context) = 0;
 
-    virtual antlrcpp::Any visitExprIdent(AslParser::ExprIdentContext *context) = 0;
-
     virtual antlrcpp::Any visitArithmetic(AslParser::ArithmeticContext *context) = 0;
+
+    virtual antlrcpp::Any visitExprIdent(AslParser::ExprIdentContext *context) = 0;
 
     virtual antlrcpp::Any visitRelational(AslParser::RelationalContext *context) = 0;
 

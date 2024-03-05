@@ -1,5 +1,5 @@
 
-// Generated from Asl.g4 by ANTLR 4.9.2
+// Generated from Asl.g4 by ANTLR 4.7.2
 
 #pragma once
 
@@ -35,6 +35,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitDatastrucure_decl(AslParser::Datastrucure_declContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitStatements(AslParser::StatementsContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -67,11 +71,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitExprIdent(AslParser::ExprIdentContext *ctx) override {
+  virtual antlrcpp::Any visitArithmetic(AslParser::ArithmeticContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitArithmetic(AslParser::ArithmeticContext *ctx) override {
+  virtual antlrcpp::Any visitExprIdent(AslParser::ExprIdentContext *ctx) override {
     return visitChildren(ctx);
   }
 

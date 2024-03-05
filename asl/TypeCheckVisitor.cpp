@@ -206,7 +206,7 @@ antlrcpp::Any TypeCheckVisitor::visitArithmetic(AslParser::ArithmeticContext *ct
   visit(ctx->expr(0));
   if (not ctx->expr(1)) {
     TypesMgr::TypeId t1 = getTypeDecor(ctx->expr(0));
-    if (not Types.isErrorTy(t1)) and (not Types.isNumericTy(t1)) {
+    if ((not Types.isErrorTy(t1)) and (not Types.isNumericTy(t1))) {
       Errors.incompatibleOperator(ctx->op);
     }
   }
