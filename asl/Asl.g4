@@ -46,7 +46,7 @@ declarations
         ;
 
 variable_decl
-        : VAR ID (COMMA variable_decl)* ':' (datastrucure_decl|type)
+        : VAR ID (COMMA variable_decl)* ':' (type)
         ;
 
 type    
@@ -57,7 +57,7 @@ type
         ;
 
 datastrucure_decl   
-        : ARRAY LSBRACKET INTVAL RSBRACKET OF type
+        : //ARRAY LSBRACKET INTVAL RSBRACKET OF type
         ;
 
 statements
@@ -86,7 +86,9 @@ left_expr
         ;
 
 // Grammar for expressions with boolean, relational and aritmetic operators
-expr    : op=MINUS expr                       # arithmetic
+expr    : LPAR expr RPAR                       # none 
+        | op=NOT expr                         #logical
+        | op=MINUS expr                       # arithmetic
         | expr op=(MUL|DIV) expr              # arithmetic
         | expr op=(PLUS|MINUS) expr           # arithmetic
         | expr op=(EQUAL|NEQ|G|L|GE|LE) expr  # relational
@@ -120,6 +122,7 @@ MUL       : '*';
 DIV       : '/';
 AND       : 'and';
 OR        : 'or';
+NOT       : 'not';
 VAR       : 'var';
 INT       : 'int';
 FLOAT     : 'float';
@@ -136,10 +139,12 @@ WRITE     : 'write' ;
 ARRAY     : 'array';
 LSBRACKET : '[';
 RSBRACKET : ']';
+LPAR      : '(';
+RPAR      : ')';
 OF        : 'of';
 INTVAL    : ('0'..'9')+ ;
 FLOATVAL  : ('0'..'9')+'.'('0'..'9')+;
-CHARVAL   : [']('a'..'z'|'A'..'Z'|'_'|'0'..'9'|'\n'|'\t'|'\'')['];
+CHARVAL   : [']('a'..'z'|'A'..'Z'|'_'|'0'..'9')['];
 BOOLVAL   : ('true'|'false');
 COMMA     : ',';
 ID        : ('a'..'z'|'A'..'Z') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')* ;
