@@ -88,7 +88,20 @@ antlrcpp::Any SymbolsVisitor::visitFunction(AslParser::FunctionContext *ctx) {
   }
   else {
     std::vector<TypesMgr::TypeId> lParamsTy;
-    TypesMgr::TypeId tRet = Types.createVoidTy();
+    for (auto typeParam : ctx->func_params()->type()) {
+      if (typeParam->INT()) lParamsTy.push_back(Types.createIntegerTy());
+      else if (typeParam->CHAR()) lParamsTy.push_back(Types.createCharacterTy());
+      else if (ctx->type()->FLOAT()) lParamsTy.push_back(Types.createFloatTy());
+      else lParamsTy.push_back(Types.createBooleanTy());
+    }
+    TypesMgr::TypeId tRet;
+    if (ctx->type()) {
+      if (ctx->type()->INT()) tRet = Types.createIntegerTy();
+      else if (ctx->type()->CHAR()) tRet = Types.createCharacterTy();
+      else if (ctx->type()->FLOAT()) tRet = Types.createFloatTy();
+      else tRet = Types.createBooleanTy();
+    }
+    else tRet = Types.createVoidTy();
     TypesMgr::TypeId tFunc = Types.createFunctionTy(lParamsTy, tRet);
     Symbols.addFunction(ident, tFunc);
   }

@@ -151,13 +151,24 @@ antlrcpp::Any CodeGenVisitor::visitIfStmt(AslParser::IfStmtContext *ctx) {
   DEBUG_ENTER();
   instructionList code;
   CodeAttribs     && codAtsE = visit(ctx->expr());
-  std::string          addr1 = codAtsE.addr;
-  instructionList &    code1 = codAtsE.code;
-  instructionList &&   code2 = visit(ctx->statements());
+  std::string          addr1 = codAtsE.addr;          //address if(expr)
+  instructionList &    code1 = codAtsE.code;          //code of if(expr)
+  instructionList &&   code2 = visit(ctx->statements(0));  //code statements of then
   std::string label = codeCounters.newLabelIF();
   std::string labelEndIf = "endif"+label;
+
+  if (ctx->ELSE()) {
+    instructionList &&   code3 = visit(ctx->statements(1));
+    std::string labelElse = "else"+label;
+    code = code1 || instruction::FJUMP(addr1, labelElse) ||
+         code2 || instruction::LABEL(labelEndIf) || instruction::LABEL(labelElse) || code3 || instruction::LABEL(labelEndIf);
+  }
+
+  else {
   code = code1 || instruction::FJUMP(addr1, labelEndIf) ||
          code2 || instruction::LABEL(labelEndIf);
+  }
+
   DEBUG_EXIT();
   return code;
 }
