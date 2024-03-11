@@ -91,7 +91,7 @@ antlrcpp::Any SymbolsVisitor::visitFunction(AslParser::FunctionContext *ctx) {
     for (auto typeParam : ctx->func_params()->type()) {
       if (typeParam->INT()) lParamsTy.push_back(Types.createIntegerTy());
       else if (typeParam->CHAR()) lParamsTy.push_back(Types.createCharacterTy());
-      else if (ctx->type()->FLOAT()) lParamsTy.push_back(Types.createFloatTy());
+      else if (typeParam->FLOAT()) lParamsTy.push_back(Types.createFloatTy());
       else lParamsTy.push_back(Types.createBooleanTy());
     }
     TypesMgr::TypeId tRet;
