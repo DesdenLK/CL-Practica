@@ -62,6 +62,7 @@ public:
   // Non visited nodes have been commented out:
   antlrcpp::Any visitProgram(AslParser::ProgramContext *ctx);
   antlrcpp::Any visitFunction(AslParser::FunctionContext *ctx);
+  antlrcpp::Any visitFunc_params(AslParser::Func_paramsContext *ctx);
   antlrcpp::Any visitDeclarations(AslParser::DeclarationsContext *ctx);
   antlrcpp::Any visitVariable_decl(AslParser::Variable_declContext *ctx);
   antlrcpp::Any visitType(AslParser::TypeContext *ctx);
