@@ -38,15 +38,20 @@ program : function+ EOF
 
 // A function has a name, a list of parameters and a list of statements
 function
-        : FUNC ID '(' ')' declarations statements ENDFUNC
+        : FUNC ID '(' func_params ')' (':'type)? declarations statements ENDFUNC
         ;
+
+func_params
+        : ((ID ':' type) (COMMA ID ':' type)*)?
+        ;
+
 
 declarations
         : (variable_decl)*
         ;
 
 variable_decl
-        : VAR ID (COMMA variable_decl)* ':' (datastrucure_decl|type)
+        : VAR ID (COMMA ID)* ':' (type)
         ;
 
 type    
@@ -57,7 +62,7 @@ type
         ;
 
 datastrucure_decl   
-        : ARRAY LSBRACKET INTVAL RSBRACKET OF type
+        : //ARRAY LSBRACKET INTVAL RSBRACKET OF type
         ;
 
 statements
@@ -69,8 +74,10 @@ statement
           // Assignment
         : left_expr ASSIGN expr ';'           # assignStmt
           // if-then-else statement (else is optional)
-        | IF expr THEN statements ENDIF       # ifStmt
+        | IF expr THEN statements (ELSE statements)? ENDIF       # ifStmt
           // A function/procedure call has a list of arguments in parenthesis (possibly empty)
+        | WHILE expr DO statements ENDWHILE   # whileStmt
+        | RETURN expr? ';'                    # returnStmt
         | ident '(' ')' ';'                   # procCall
           // Read a variable
         | READ left_expr ';'                  # readStmt
@@ -86,7 +93,9 @@ left_expr
         ;
 
 // Grammar for expressions with boolean, relational and aritmetic operators
-expr    : op=MINUS expr                       # arithmetic
+expr    : LPAR expr RPAR                       # none 
+        | op=NOT expr                         #logical
+        | op=MINUS expr                       # arithmetic
         | expr op=(MUL|DIV) expr              # arithmetic
         | expr op=(PLUS|MINUS) expr           # arithmetic
         | expr op=(EQUAL|NEQ|G|L|GE|LE) expr  # relational
@@ -120,26 +129,33 @@ MUL       : '*';
 DIV       : '/';
 AND       : 'and';
 OR        : 'or';
+NOT       : 'not';
 VAR       : 'var';
 INT       : 'int';
 FLOAT     : 'float';
 CHAR      : 'char';
 BOOL      : 'bool';
 IF        : 'if' ;
-THEN      : 'then' ;
-ELSE      : 'else' ;
+THEN      : 'then';
+ELSE      : 'else';
 ENDIF     : 'endif' ;
+WHILE     : 'while';
+DO        : 'do' ;
+ENDWHILE  : 'endwhile';
 FUNC      : 'func' ;
 ENDFUNC   : 'endfunc' ;
 READ      : 'read' ;
 WRITE     : 'write' ;
 ARRAY     : 'array';
+RETURN    : 'return';
 LSBRACKET : '[';
 RSBRACKET : ']';
+LPAR      : '(';
+RPAR      : ')';
 OF        : 'of';
 INTVAL    : ('0'..'9')+ ;
 FLOATVAL  : ('0'..'9')+'.'('0'..'9')+;
-CHARVAL   : [']('a'..'z'|'A'..'Z'|'_'|'0'..'9'|'\n'|'\t'|'\'')['];
+CHARVAL   : [']('a'..'z'|'A'..'Z'|'_'|'0'..'9')['];
 BOOLVAL   : ('true'|'false');
 COMMA     : ',';
 ID        : ('a'..'z'|'A'..'Z') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')* ;

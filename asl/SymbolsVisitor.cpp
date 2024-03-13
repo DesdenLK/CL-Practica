@@ -79,6 +79,7 @@ antlrcpp::Any SymbolsVisitor::visitFunction(AslParser::FunctionContext *ctx) {
   std::string funcName = ctx->ID()->getText();
   SymTable::ScopeId sc = Symbols.pushNewScope(funcName);
   putScopeDecor(ctx, sc);
+  visit(ctx->func_params());
   visit(ctx->declarations());
   // Symbols.print();
   Symbols.popScope();
@@ -88,9 +89,33 @@ antlrcpp::Any SymbolsVisitor::visitFunction(AslParser::FunctionContext *ctx) {
   }
   else {
     std::vector<TypesMgr::TypeId> lParamsTy;
-    TypesMgr::TypeId tRet = Types.createVoidTy();
+    for (auto typeParam : ctx->func_params()->type()) {
+      if (typeParam->INT()) lParamsTy.push_back(Types.createIntegerTy());
+      else if (typeParam->CHAR()) lParamsTy.push_back(Types.createCharacterTy());
+      else if (typeParam->FLOAT()) lParamsTy.push_back(Types.createFloatTy());
+      else lParamsTy.push_back(Types.createBooleanTy());
+    }
+    TypesMgr::TypeId tRet;
+    if (ctx->type()) {
+      if (ctx->type()->INT()) tRet = Types.createIntegerTy();
+      else if (ctx->type()->CHAR()) tRet = Types.createCharacterTy();
+      else if (ctx->type()->FLOAT()) tRet = Types.createFloatTy();
+      else tRet = Types.createBooleanTy();
+    }
+    else tRet = Types.createVoidTy();
     TypesMgr::TypeId tFunc = Types.createFunctionTy(lParamsTy, tRet);
     Symbols.addFunction(ident, tFunc);
+  }
+  DEBUG_EXIT();
+  return 0;
+}
+
+antlrcpp::Any SymbolsVisitor::visitFunc_params(AslParser::Func_paramsContext *ctx) {
+  DEBUG_ENTER();
+  for (unsigned int i = 0; i < ctx->ID().size(); ++i) {
+    std::string idStr = ctx->ID(i)->getText();
+    TypesMgr::TypeId idType = getTypeDecor(ctx->type(i)); //getTypeDecor no l'he torbat a la docu
+    Symbols.addParameter(idStr,idType);
   }
   DEBUG_EXIT();
   return 0;
@@ -106,13 +131,15 @@ antlrcpp::Any SymbolsVisitor::visitDeclarations(AslParser::DeclarationsContext *
 antlrcpp::Any SymbolsVisitor::visitVariable_decl(AslParser::Variable_declContext *ctx) {
   DEBUG_ENTER();
   visit(ctx->type());
-  std::string ident = ctx->ID()->getText();
-  if (Symbols.findInCurrentScope(ident)) {
-    Errors.declaredIdent(ctx->ID());
-  }
-  else {
-    TypesMgr::TypeId t1 = getTypeDecor(ctx->type());
-    Symbols.addLocalVar(ident, t1);
+  for (auto varID : ctx->ID()) {
+    std::string ident = varID->getText();
+    if (Symbols.findInCurrentScope(ident)) {
+      Errors.declaredIdent(varID);
+    }
+    else {
+      TypesMgr::TypeId t1 = getTypeDecor(ctx->type());
+      Symbols.addLocalVar(ident, t1);
+    }
   }
   DEBUG_EXIT();
   return 0;
