@@ -61,7 +61,7 @@ type
         | BOOL
         ;
 
-datastrucure_decl   
+array_decl
         : //ARRAY LSBRACKET INTVAL RSBRACKET OF type
         ;
 
@@ -89,12 +89,13 @@ statement
 
 // Grammar for left expressions (l-values in C++)
 left_expr
-        : ident
+        : ident (LBRACKET expr RBRACKET)?
         ;
 
 // Grammar for expressions with boolean, relational and aritmetic operators
-expr    : LPAR expr RPAR                       # none 
-        | op=NOT expr                         #logical
+expr    : ident LBRACKET expr RBRACKET        # arrayAccess  
+        | LPAR expr RPAR                      # none 
+        | op=NOT expr                         # logical
         | op=MINUS expr                       # arithmetic
         | expr op=(MUL|DIV) expr              # arithmetic
         | expr op=(PLUS|MINUS) expr           # arithmetic
@@ -148,8 +149,8 @@ READ      : 'read' ;
 WRITE     : 'write' ;
 ARRAY     : 'array';
 RETURN    : 'return';
-LSBRACKET : '[';
-RSBRACKET : ']';
+LBRACKET : '[';
+RBRACKET : ']';
 LPAR      : '(';
 RPAR      : ')';
 OF        : 'of';

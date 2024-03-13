@@ -20,7 +20,7 @@ public class AslLexer extends Lexer {
 		MINUS=11, MUL=12, DIV=13, AND=14, OR=15, NOT=16, VAR=17, INT=18, FLOAT=19, 
 		CHAR=20, BOOL=21, IF=22, THEN=23, ELSE=24, ENDIF=25, WHILE=26, DO=27, 
 		ENDWHILE=28, FUNC=29, ENDFUNC=30, READ=31, WRITE=32, ARRAY=33, RETURN=34, 
-		LSBRACKET=35, RSBRACKET=36, LPAR=37, RPAR=38, OF=39, INTVAL=40, FLOATVAL=41, 
+		LBRACKET=35, RBRACKET=36, LPAR=37, RPAR=38, OF=39, INTVAL=40, FLOATVAL=41, 
 		CHARVAL=42, BOOLVAL=43, COMMA=44, ID=45, STRING=46, COMMENT=47, WS=48;
 	public static String[] channelNames = {
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"
@@ -35,7 +35,7 @@ public class AslLexer extends Lexer {
 			"T__0", "T__1", "EQUAL", "NEQ", "G", "L", "GE", "LE", "ASSIGN", "PLUS", 
 			"MINUS", "MUL", "DIV", "AND", "OR", "NOT", "VAR", "INT", "FLOAT", "CHAR", 
 			"BOOL", "IF", "THEN", "ELSE", "ENDIF", "WHILE", "DO", "ENDWHILE", "FUNC", 
-			"ENDFUNC", "READ", "WRITE", "ARRAY", "RETURN", "LSBRACKET", "RSBRACKET", 
+			"ENDFUNC", "READ", "WRITE", "ARRAY", "RETURN", "LBRACKET", "RBRACKET", 
 			"LPAR", "RPAR", "OF", "INTVAL", "FLOATVAL", "CHARVAL", "BOOLVAL", "COMMA", 
 			"ID", "STRING", "ESC_SEQ", "COMMENT", "WS"
 		};
@@ -58,7 +58,7 @@ public class AslLexer extends Lexer {
 			null, null, null, "EQUAL", "NEQ", "G", "L", "GE", "LE", "ASSIGN", "PLUS", 
 			"MINUS", "MUL", "DIV", "AND", "OR", "NOT", "VAR", "INT", "FLOAT", "CHAR", 
 			"BOOL", "IF", "THEN", "ELSE", "ENDIF", "WHILE", "DO", "ENDWHILE", "FUNC", 
-			"ENDFUNC", "READ", "WRITE", "ARRAY", "RETURN", "LSBRACKET", "RSBRACKET", 
+			"ENDFUNC", "READ", "WRITE", "ARRAY", "RETURN", "LBRACKET", "RBRACKET", 
 			"LPAR", "RPAR", "OF", "INTVAL", "FLOATVAL", "CHARVAL", "BOOLVAL", "COMMA", 
 			"ID", "STRING", "COMMENT", "WS"
 		};

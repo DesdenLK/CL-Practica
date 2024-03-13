@@ -114,7 +114,7 @@ antlrcpp::Any SymbolsVisitor::visitFunc_params(AslParser::Func_paramsContext *ct
   DEBUG_ENTER();
   for (unsigned int i = 0; i < ctx->ID().size(); ++i) {
     std::string idStr = ctx->ID(i)->getText();
-    TypesMgr::TypeId idType = getTypeDecor(ctx->type(i)); //getTypeDecor no l'he torbat a la docu
+    TypesMgr::TypeId idType = getTypeDecor(ctx->type(i)); 
     Symbols.addParameter(idStr,idType);
   }
   DEBUG_EXIT();

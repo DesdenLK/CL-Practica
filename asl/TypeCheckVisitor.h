@@ -80,6 +80,7 @@ public:
   antlrcpp::Any visitArithmetic(AslParser::ArithmeticContext *ctx);
   antlrcpp::Any visitRelational(AslParser::RelationalContext *ctx);
   antlrcpp::Any visitLogical(AslParser::LogicalContext *ctx);             //Implementat manualment
+  antlrcpp::Any visitArrayAccess(AslParser::ArrayAccessContext *ctx);     //Implementat manualment
   antlrcpp::Any visitValue(AslParser::ValueContext *ctx);
   antlrcpp::Any visitIdent(AslParser::IdentContext *ctx);
 
