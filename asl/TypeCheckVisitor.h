@@ -85,6 +85,7 @@ public:
 
   antlrcpp::Any visitNone(AslParser::NoneContext *ctx);
   antlrcpp::Any visitArrayElement(AslParser::ArrayElementContext *ctx);
+  antlrcpp::Any visitFunctionCall(AslParser::FunctionCallContext *ctx);
 
 private:
 

@@ -405,6 +405,16 @@ antlrcpp::Any TypeCheckVisitor::visitArrayElement(AslParser::ArrayElementContext
   return 0;
 }
 
+antlrcpp::Any TypeCheckVisitor::visitFunctionCall(AslParser::FunctionCallContext *ctx) {
+  DEBUG_ENTER();
+  visit(ctx -> ident());
+  TypesMgr::TypeId t1 = getTypeDecor(ctx -> ident());
+  putTypeDecor(ctx, t1);
+  putIsLValueDecor(ctx,t1);
+  DEBUG_EXIT();
+  return 0;
+}
+
 
 // Getters for the necessary tree node atributes:
 //   Scope, Type ans IsLValue
