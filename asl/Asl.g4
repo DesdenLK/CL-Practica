@@ -89,11 +89,12 @@ statement
 
 // Grammar for left expressions (l-values in C++)
 left_expr
-        : ident
+        : ident (LSBRACKET expr RSBRACKET)?
         ;
 
 // Grammar for expressions with boolean, relational and aritmetic operators
-expr    : LPAR expr RPAR                       # none 
+expr    : LPAR expr RPAR                       # none
+        | ident LSBRACKET expr RSBRACKET      #arrayElement
         | op=NOT expr                         #logical
         | op=MINUS expr                       # arithmetic
         | expr op=(MUL|DIV) expr              # arithmetic

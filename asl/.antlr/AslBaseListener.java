@@ -1,4 +1,4 @@
-// Generated from /home/albert/UNI/CL/pbo/CL-Practica/asl/Asl.g4 by ANTLR 4.13.1
+// Generated from /home/luca/Documents/UPC/3r_Q1_2023-2024/CL/CL-Practica/asl/Asl.g4 by ANTLR 4.13.1
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;

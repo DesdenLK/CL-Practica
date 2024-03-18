@@ -84,6 +84,7 @@ public:
   antlrcpp::Any visitIdent(AslParser::IdentContext *ctx);
 
   antlrcpp::Any visitNone(AslParser::NoneContext *ctx);
+  antlrcpp::Any visitArrayElement(AslParser::ArrayElementContext *ctx);
 
 private:
 

@@ -212,8 +212,30 @@ antlrcpp::Any TypeCheckVisitor::visitLeft_expr(AslParser::Left_exprContext *ctx)
   DEBUG_ENTER();
   visit(ctx->ident());
   TypesMgr::TypeId t1 = getTypeDecor(ctx->ident());
-  putTypeDecor(ctx, t1);
   bool b = getIsLValueDecor(ctx->ident());
+
+  bool error = false;
+
+  if (ctx -> expr()) {
+    visit(ctx -> expr());
+    TypesMgr::TypeId t2 = getTypeDecor(ctx -> expr());
+    if (not Types.isErrorTy(t1) and not Types.isArrayTy(t1)) {
+      Errors.nonArrayInArrayAccess(ctx);
+      t1 = Types.createErrorTy();
+      b = false;
+      error = true;
+    }
+    if (not Types.isErrorTy(t2) and not Types.isIntegerTy(t2)) {
+      Errors.nonIntegerIndexInArrayAccess(ctx -> expr());
+      error = true;
+    }
+    if (not error) {
+      t1 = Types.getArrayElemType(t1);
+      b = true;
+    }
+  }
+
+  putTypeDecor(ctx, t1);
   putIsLValueDecor(ctx, b);
   DEBUG_EXIT();
   return 0;
@@ -346,6 +368,39 @@ antlrcpp::Any TypeCheckVisitor::visitNone(AslParser::NoneContext *ctx) {
   TypesMgr::TypeId t1 = getTypeDecor(ctx -> expr());
   putTypeDecor(ctx, t1);
   putIsLValueDecor(ctx,t1);
+  DEBUG_EXIT();
+  return 0;
+}
+
+antlrcpp::Any TypeCheckVisitor::visitArrayElement(AslParser::ArrayElementContext *ctx) {
+  DEBUG_ENTER();
+
+  visit(ctx->ident());
+
+  TypesMgr::TypeId t1 = getTypeDecor(ctx->ident());
+  bool b = getIsLValueDecor(ctx->ident());
+
+  visit(ctx -> expr());
+  bool error = false;
+  
+  TypesMgr::TypeId t2 = getTypeDecor(ctx -> expr());
+  if (not Types.isErrorTy(t1) and not Types.isArrayTy(t1)) {
+    Errors.nonArrayInArrayAccess(ctx);
+    t1 = Types.createErrorTy();
+    b = false;
+    error = true;
+  }
+  if (not Types.isErrorTy(t2) and not Types.isIntegerTy(t2)) {
+    Errors.nonIntegerIndexInArrayAccess(ctx -> expr());
+    error = true;
+  }
+  if (not error) {
+    t1 = Types.getArrayElemType(t1);
+    b = true;
+  }
+
+  putTypeDecor(ctx, t1);
+  putIsLValueDecor(ctx, b);
   DEBUG_EXIT();
   return 0;
 }
