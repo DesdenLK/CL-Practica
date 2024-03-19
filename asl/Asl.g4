@@ -95,7 +95,7 @@ left_expr
 // Grammar for expressions with boolean, relational and aritmetic operators
 expr    : LPAR expr RPAR                       # none
         | ident LSBRACKET expr RSBRACKET      #arrayElement
-        | ident LPAR RPAR                     #functionCall
+        | ident LPAR (expr (',' expr)*)? RPAR                     #functionCall
         | op=NOT expr                         #logical
         | op=MINUS expr                       # arithmetic
         | expr op=(MUL|DIV) expr              # arithmetic
