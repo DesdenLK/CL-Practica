@@ -38,7 +38,7 @@ program : function+ EOF
 
 // A function has a name, a list of parameters and a list of statements
 function
-        : FUNC ID '(' func_params ')' (':'type)? declarations statements ENDFUNC
+        : FUNC ID '(' func_params ')' (':'basic_type)? declarations statements ENDFUNC
         ;
 
 func_params
@@ -54,7 +54,11 @@ variable_decl
         : VAR ID (COMMA ID)* ':' (type)
         ;
 
-type    
+type
+        : basic_type
+        | datastrucure_decl
+        ;
+basic_type    
         : INT
         | FLOAT
         | CHAR
@@ -62,7 +66,7 @@ type
         ;
 
 datastrucure_decl   
-        : //ARRAY LSBRACKET INTVAL RSBRACKET OF type
+        : ARRAY LSBRACKET INTVAL RSBRACKET OF basic_type
         ;
 
 statements
