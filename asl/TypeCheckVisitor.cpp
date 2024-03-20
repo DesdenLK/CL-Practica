@@ -95,6 +95,33 @@ antlrcpp::Any TypeCheckVisitor::visitFunction(AslParser::FunctionContext *ctx) {
 
 antlrcpp::Any TypeCheckVisitor::visitReturnStmt(AslParser::ReturnStmtContext *ctx) {
   DEBUG_ENTER();
+  TypesMgr::TypeId tRet = getCurrentFunctionTy();
+  TypesMgr::TypeId t1;
+  if (ctx -> expr()) { //RETURN DE NON VOID
+    visit(ctx -> expr());
+    t1 = getTypeDecor(ctx -> expr());
+    if (not Types.isErrorTy(t1) and Types.isVoidTy(t1)) {
+      Errors.incompatibleReturn(ctx -> RETURN());
+      t1 = Types.createErrorTy();
+    }
+    else if (not Types.isErrorTy(t1) and not Types.equalTypes(t1,tRet)) {
+      Errors.incompatibleReturn(ctx -> RETURN());
+      t1 = Types.createErrorTy();
+    }
+    else {
+      putTypeDecor(ctx, t1);
+    }
+  }
+  else {
+    if (not Types.equalTypes(tRet, Types.createVoidTy())) {
+      Errors.incompatibleReturn(ctx -> RETURN());
+      t1 = Types.createErrorTy();
+    }
+    else {
+      t1 = Types.createVoidTy();
+    }
+    putTypeDecor(ctx, t1);
+  }
   DEBUG_EXIT();
   return 0;
 }
