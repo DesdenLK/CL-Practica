@@ -411,10 +411,16 @@ antlrcpp::Any TypeCheckVisitor::visitFunctionCall(AslParser::FunctionCallContext
   TypesMgr::TypeId t1 = getTypeDecor(ctx -> ident());
 
   if (not Types.isErrorTy(t1)) {
-    if (Types.isVoidTy(t1)) {Errors.isNotFunction(ctx -> ident()); t1 = Types.createErrorTy();}
-    else if (not Types.isFunctionTy(t1)) {Errors.isNotCallable(ctx->ident()); t1 = Types.createErrorTy();}
-    else{
-      t1 = Types.getFuncReturnType(t1);
+    if (not Types.isFunctionTy(t1)) {Errors.isNotCallable(ctx->ident()); t1 = Types.createErrorTy();}
+    else {
+      TypesMgr::TypeId tr = Types.getFuncReturnType(t1);
+      if (Types.isVoidTy(tr)) {
+        Errors.isNotFunction(ctx -> ident()); 
+        t1 = Types.createErrorTy();
+      }
+      else{
+        t1 = tr;
+      }
     }
   }
 
