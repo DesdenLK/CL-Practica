@@ -110,7 +110,7 @@ antlrcpp::Any TypeCheckVisitor::visitReturnStmt(AslParser::ReturnStmtContext *ct
       Errors.incompatibleReturn(ctx -> RETURN());
       t1 = Types.createErrorTy();
     }
-    else if (not Types.isErrorTy(t1) and ((Types.isFloatTy(t1) and Types.isIntegerTy(tRet)) or (not Types.comparableTypes(t1,tRet,"=")))) {
+    else if (not Types.isErrorTy(t1) and ((Types.isFloatTy(t1) and Types.isIntegerTy(tRet)) or (not Types.comparableTypes(t1,tRet,"==")))) {
       Errors.incompatibleReturn(ctx -> RETURN());
       t1 = Types.createErrorTy();
     }
@@ -262,7 +262,7 @@ antlrcpp::Any TypeCheckVisitor::visitLeft_expr(AslParser::Left_exprContext *ctx)
       Errors.nonIntegerIndexInArrayAccess(ctx -> expr());
       error = true;
     }
-    if (not error) {
+    if (not Types.isErrorTy(t1) and not error) {
       t1 = Types.getArrayElemType(t1);
       b = true;
     }
@@ -427,7 +427,7 @@ antlrcpp::Any TypeCheckVisitor::visitArrayElement(AslParser::ArrayElementContext
     Errors.nonIntegerIndexInArrayAccess(ctx -> expr());
     error = true;
   }
-  if (not error) {
+  if (not Types.isErrorTy(t1) and not error) {
     t1 = Types.getArrayElemType(t1);
     b = true;
   }
