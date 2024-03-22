@@ -86,6 +86,12 @@ antlrcpp::Any TypeCheckVisitor::visitFunction(AslParser::FunctionContext *ctx) {
   DEBUG_ENTER();
   SymTable::ScopeId sc = getScopeDecor(ctx);
   Symbols.pushThisScope(sc);
+  if (ctx->basic_type()) {
+    visit(ctx->basic_type());
+    TypesMgr::TypeId tfunc = getTypeDecor(ctx->basic_type());
+    setCurrentFunctionTy(tfunc);
+  }
+  else setCurrentFunctionTy(Types.createVoidTy());
   // Symbols.print();
   visit(ctx->statements());
   Symbols.popScope();
@@ -104,7 +110,7 @@ antlrcpp::Any TypeCheckVisitor::visitReturnStmt(AslParser::ReturnStmtContext *ct
       Errors.incompatibleReturn(ctx -> RETURN());
       t1 = Types.createErrorTy();
     }
-    else if (not Types.isErrorTy(t1) and not Types.equalTypes(t1,tRet)) {
+    else if (not Types.isErrorTy(t1) and ((Types.isFloatTy(t1) and Types.isIntegerTy(tRet)) or (not Types.comparableTypes(t1,tRet,"=")))) {
       Errors.incompatibleReturn(ctx -> RETURN());
       t1 = Types.createErrorTy();
     }
