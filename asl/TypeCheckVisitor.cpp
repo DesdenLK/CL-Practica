@@ -425,6 +425,7 @@ antlrcpp::Any TypeCheckVisitor::visitArrayElement(AslParser::ArrayElementContext
   }
   if (not Types.isErrorTy(t2) and not Types.isIntegerTy(t2)) {
     Errors.nonIntegerIndexInArrayAccess(ctx -> expr());
+    t1 = Types.createErrorTy();
     error = true;
   }
   if (not Types.isErrorTy(t1) and not error) {
@@ -452,7 +453,19 @@ antlrcpp::Any TypeCheckVisitor::visitFunctionCall(AslParser::FunctionCallContext
         t1 = Types.createErrorTy();
       }
       else{
-        t1 = tr;
+        std::vector<TypesMgr::TypeId> paramTypes = Types.getFuncParamsTypes(t1);
+        std::vector<TypesMgr::TypeId> callToFuncParamTypes;
+        uint numErrors = 0;
+        for (uint i=0; i < ctx->expr().size(); ++i) {
+          visit(ctx->expr(i));
+          TypesMgr::TypeId tParamI = getTypeDecor(ctx->expr(i));
+          if (Types.isErrorTy(tParamI) or not Types.equalTypes(tParamI,paramTypes[i])) {
+            Errors.incompatibleParameter(ctx->expr(i),i+1,ctx);
+            t1 = Types.createErrorTy();
+            ++numErrors;
+          }
+        }
+        if (numErrors == 0) t1 = tr;
       }
     }
   }

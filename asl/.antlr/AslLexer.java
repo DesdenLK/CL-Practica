@@ -1,4 +1,4 @@
-// Generated from /home/luca/Documents/UPC/3r_Q1_2023-2024/CL/CL-Practica/asl/Asl.g4 by ANTLR 4.13.1
+// Generated from /home/aleix/albertjr/CL/CL-Practica/asl/Asl.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
