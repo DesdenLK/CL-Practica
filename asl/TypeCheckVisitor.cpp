@@ -208,17 +208,17 @@ antlrcpp::Any TypeCheckVisitor::visitProcCall(AslParser::ProcCallContext *ctx) {
     Errors.isNotCallable(ctx->ident());
   }
   else {
-    std::vector<TypesMgr::TypeId> paramTypes = Types.getFuncParamsTypes(t1);
+    int numParams = Types.getNumOfParameters(t1);
     int numParamsUser = 0;
     if (ctx->expr(0)) numParamsUser = ctx->expr().size();
-    if (numParamsUser != paramTypes.size()) Errors.numberOfParameters(ctx->ident());
+    if (numParamsUser != numParams) Errors.numberOfParameters(ctx->ident());
     else {
+      std::vector<TypesMgr::TypeId> paramTypes = Types.getFuncParamsTypes(t1);
       for (uint i=0; i < ctx->expr().size(); ++i) {
         visit(ctx->expr(i));
         TypesMgr::TypeId tParamI = getTypeDecor(ctx->expr(i));
         if (not Types.isErrorTy(tParamI) and not Types.copyableTypes(tParamI,paramTypes[i])) {
           Errors.incompatibleParameter(ctx->expr(i),i+1,ctx);
-          //t1 = Types.createErrorTy();
         }
       }
     }
