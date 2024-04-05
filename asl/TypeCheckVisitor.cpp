@@ -471,7 +471,6 @@ antlrcpp::Any TypeCheckVisitor::visitFunctionCall(AslParser::FunctionCallContext
               t1 = Types.createErrorTy();
             }
           }
-          // if (not Types.isErrorTy(t1)) t1 = tr;
         }
         t1 = tr;
       }
