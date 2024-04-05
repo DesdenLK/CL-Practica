@@ -118,8 +118,13 @@ antlrcpp::Any SymbolsVisitor::visitFunc_params(AslParser::Func_paramsContext *ct
   for (unsigned int i = 0; i < ctx->ID().size(); ++i) {
     std::string idStr = ctx->ID(i)->getText();
     visit(ctx -> type(i));
+    if (Symbols.findInCurrentScope(idStr)) {
+      Errors.declaredIdent(ctx -> ID(i));
+    }
+    else {
     TypesMgr::TypeId idType = getTypeDecor(ctx->type(i)); //getTypeDecor no l'he torbat a la docu
     Symbols.addParameter(idStr,idType);
+    }
   }
   DEBUG_EXIT();
   return 0;
