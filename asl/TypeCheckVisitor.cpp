@@ -461,16 +461,18 @@ antlrcpp::Any TypeCheckVisitor::visitFunctionCall(AslParser::FunctionCallContext
       else{
         std::vector<TypesMgr::TypeId> paramTypes = Types.getFuncParamsTypes(t1);
         std::vector<TypesMgr::TypeId> callToFuncParamTypes;
-        uint numErrors = 0;
-        for (uint i=0; i < ctx->expr().size(); ++i) {
-          TypesMgr::TypeId tParamI = getTypeDecor(ctx->expr(i));
-          if (not Types.isErrorTy(tParamI) and not Types.copyableTypes(tParamI,paramTypes[i])) {
-            Errors.incompatibleParameter(ctx->expr(i),i+1,ctx);
-            t1 = Types.createErrorTy();
-            ++numErrors;
+        int numParamsUser = ctx->expr().size();
+        if (numParamsUser != paramTypes.size()) Errors.numberOfParameters(ctx->ident());
+        else {
+          for (uint i=0; i < ctx->expr().size(); ++i) {
+            TypesMgr::TypeId tParamI = getTypeDecor(ctx->expr(i));
+            if (not Types.isErrorTy(tParamI) and not Types.copyableTypes(tParamI,paramTypes[i])) {
+              Errors.incompatibleParameter(ctx->expr(i),i+1,ctx);
+              t1 = Types.createErrorTy();
+            }
           }
+          // if (not Types.isErrorTy(t1)) t1 = tr;
         }
-        // if (not Types.isErrorTy(t1)) t1 = tr;
         t1 = tr;
       }
     }
