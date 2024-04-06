@@ -482,24 +482,22 @@ antlrcpp::Any TypeCheckVisitor::visitFunctionCall(AslParser::FunctionCallContext
       TypesMgr::TypeId tr = Types.getFuncReturnType(t1);
       if (Types.isVoidTy(tr)) {
         Errors.isNotFunction(ctx -> ident()); 
-        t1 = Types.createErrorTy();
       }
-      else{
-        std::vector<TypesMgr::TypeId> paramTypes = Types.getFuncParamsTypes(t1);
-        std::vector<TypesMgr::TypeId> callToFuncParamTypes;
-        int numParamsUser = ctx->expr().size();
-        if (numParamsUser != paramTypes.size()) Errors.numberOfParameters(ctx->ident());
-        else {
-          for (uint i=0; i < ctx->expr().size(); ++i) {
-            TypesMgr::TypeId tParamI = getTypeDecor(ctx->expr(i));
-            if (not Types.isErrorTy(tParamI) and not Types.copyableTypes(tParamI,paramTypes[i])) {
-              Errors.incompatibleParameter(ctx->expr(i),i+1,ctx);
-              t1 = Types.createErrorTy();
-            }
+      std::vector<TypesMgr::TypeId> paramTypes = Types.getFuncParamsTypes(t1);
+      std::vector<TypesMgr::TypeId> callToFuncParamTypes;
+      int numParamsUser = ctx->expr().size();
+      if (numParamsUser != paramTypes.size()) Errors.numberOfParameters(ctx->ident());
+      else {
+        for (uint i=0; i < ctx->expr().size(); ++i) {
+          TypesMgr::TypeId tParamI = getTypeDecor(ctx->expr(i));
+          if (not Types.isErrorTy(tParamI) and not Types.copyableTypes(paramTypes[i], tParamI)) {
+            Errors.incompatibleParameter(ctx->expr(i),i+1,ctx);
+            t1 = Types.createErrorTy();
           }
         }
-        t1 = tr;
       }
+      if (not Types.isVoidTy(tr)) t1 = tr;
+      else t1 = Types.createErrorTy();
     }
   }
 
