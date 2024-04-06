@@ -444,21 +444,17 @@ antlrcpp::Any TypeCheckVisitor::visitArrayElement(AslParser::ArrayElementContext
   bool b = getIsLValueDecor(ctx->ident());
 
   visit(ctx -> expr());
-  bool error = false;
   
   TypesMgr::TypeId t2 = getTypeDecor(ctx -> expr());
   if (not Types.isErrorTy(t1) and not Types.isArrayTy(t1)) {
     Errors.nonArrayInArrayAccess(ctx);
     t1 = Types.createErrorTy();
     b = false;
-    error = true;
   }
   if (not Types.isErrorTy(t2) and not Types.isIntegerTy(t2)) {
     Errors.nonIntegerIndexInArrayAccess(ctx -> expr());
-    t1 = Types.createErrorTy();
-    error = true;
   }
-  if (not Types.isErrorTy(t1) and not error) {
+  if (not Types.isErrorTy(t1)) {
     t1 = Types.getArrayElemType(t1);
     b = true;
   }
