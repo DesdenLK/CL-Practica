@@ -308,9 +308,19 @@ antlrcpp::Any TypeCheckVisitor::visitArithmetic(AslParser::ArithmeticContext *ct
     TypesMgr::TypeId t1 = getTypeDecor(ctx->expr(0));
     visit(ctx->expr(1));
     TypesMgr::TypeId t2 = getTypeDecor(ctx->expr(1));
-    if (((not Types.isErrorTy(t1)) and (not Types.isNumericTy(t1))) or
+    if (ctx->MOD()) {
+      if (((not Types.isErrorTy(t1)) and (not Types.isNumericTy(t1))) or
         ((not Types.isErrorTy(t2)) and (not Types.isNumericTy(t2))))
-      Errors.incompatibleOperator(ctx->op); //missatge error, diferent a la decoracio de tipus
+          Errors.incompatibleOperator(ctx->op);
+      else if (not Types.isErrorTy(t1) and not Types.isErrorTy(t2) and
+               Types.isNumericTy(t1) and Types.isNumericTy(t2) and not Types.equalTypes(t1,t2))
+                Errors.incompatibleOperator(ctx->op);
+    }
+    else {
+      if (((not Types.isErrorTy(t1)) and (not Types.isNumericTy(t1))) or
+          ((not Types.isErrorTy(t2)) and (not Types.isNumericTy(t2))))
+        Errors.incompatibleOperator(ctx->op); //missatge error, diferent a la decoracio de tipus
+    }
     
     //programar cas en que no es pot inferir el tipus. 
     TypesMgr::TypeId t;

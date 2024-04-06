@@ -102,7 +102,7 @@ expr    : LPAR expr RPAR                       # none
         | ident LPAR (expr (',' expr)*)? RPAR                     #functionCall
         | op=NOT expr                         #logical
         | op=MINUS expr                       # arithmetic
-        | expr op=(MUL|DIV) expr              # arithmetic
+        | expr op=(MUL|DIV|MOD) expr              # arithmetic
         | expr op=(PLUS|MINUS) expr           # arithmetic
         | expr op=(EQUAL|NEQ|G|L|GE|LE) expr  # relational
         | expr op=AND expr                    # logical
@@ -133,6 +133,7 @@ PLUS      : '+' ;
 MINUS     : '-';
 MUL       : '*';
 DIV       : '/';
+MOD       : '%';
 AND       : 'and';
 OR        : 'or';
 NOT       : 'not';
