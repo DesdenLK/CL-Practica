@@ -302,6 +302,12 @@ antlrcpp::Any TypeCheckVisitor::visitArithmetic(AslParser::ArithmeticContext *ct
     if ((not Types.isErrorTy(t1)) and (not Types.isNumericTy(t1))) {
       Errors.incompatibleOperator(ctx->op);
     }
+    TypesMgr::TypeId t;
+    if (Types.isFloatTy(t1)) t = Types.createFloatTy();
+    else t = Types.createIntegerTy();
+    putTypeDecor(ctx, t);
+    putIsLValueDecor(ctx, false);
+    DEBUG_EXIT();
   }
   //falta
   else {
