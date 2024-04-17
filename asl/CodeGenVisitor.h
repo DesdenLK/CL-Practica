@@ -82,6 +82,12 @@ public:
   antlrcpp::Any visitValue(AslParser::ValueContext *ctx);
   antlrcpp::Any visitIdent(AslParser::IdentContext *ctx);
 
+  antlrcpp::Any visitLogical(AslParser::LogicalContext *ctx);
+
+
+
+  antlrcpp::Any visitNone(AslParser::NoneContext *ctx);
+
 private:
 
   // Attributes

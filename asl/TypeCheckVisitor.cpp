@@ -267,8 +267,6 @@ antlrcpp::Any TypeCheckVisitor::visitLeft_expr(AslParser::Left_exprContext *ctx)
   TypesMgr::TypeId t1 = getTypeDecor(ctx->ident());
   bool b = getIsLValueDecor(ctx->ident());
 
-  bool error = false;
-
   if (ctx -> expr()) {
     visit(ctx -> expr());
     TypesMgr::TypeId t2 = getTypeDecor(ctx -> expr());
@@ -276,13 +274,11 @@ antlrcpp::Any TypeCheckVisitor::visitLeft_expr(AslParser::Left_exprContext *ctx)
       Errors.nonArrayInArrayAccess(ctx);
       t1 = Types.createErrorTy();
       b = false;
-      error = true;
     }
     if (not Types.isErrorTy(t2) and not Types.isIntegerTy(t2)) {
       Errors.nonIntegerIndexInArrayAccess(ctx -> expr());
-      error = true;
     }
-    if (not Types.isErrorTy(t1) and not error) {
+    if (not Types.isErrorTy(t1)) {
       t1 = Types.getArrayElemType(t1);
       b = true;
     }
