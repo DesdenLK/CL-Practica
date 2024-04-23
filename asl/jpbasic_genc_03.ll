@@ -15,19 +15,19 @@ define dso_local void @f() {
     %.temp.2 = icmp eq i32 %a.1, %.temp.1
     br i1 %.temp.2, label %.br.cont.1, label %endif1
   .br.cont.1:
-    %.temp.3 = trunc i64 3 to i32
-    store i32 %.temp.3, i32* %a.addr
+    %.temp.4 = trunc i64 3 to i32
+    store i32 %.temp.4, i32* %a.addr
     br label %endif1
   endif1:
-    %.temp.4 = trunc i64 67 to i32
+    %.temp.6 = trunc i64 67 to i32
     %a.2 = load i32, i32* %a.addr
-    %.temp.5 = add i32 %a.2, %.temp.4
+    %.temp.5 = add i32 %a.2, %.temp.6
     store i32 %.temp.5, i32* %b.addr
     %b.1 = load i32, i32* %b.addr
     %a.3 = load i32, i32* %a.addr
-    %.temp.6 = add i32 %b.1, %a.3
-    %.temp.7 = trunc i64 1 to i32
-    %.temp.8 = add i32 %.temp.6, %.temp.7
+    %.temp.7 = add i32 %b.1, %a.3
+    %.temp.9 = trunc i64 1 to i32
+    %.temp.8 = add i32 %.temp.7, %.temp.9
     call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str.i, i64 0, i64 0), i32 %.temp.8)
     ret void
 }

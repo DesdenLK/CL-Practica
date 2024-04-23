@@ -177,6 +177,24 @@ antlrcpp::Any CodeGenVisitor::visitIfStmt(AslParser::IfStmtContext *ctx) {
   return code;
 }
 
+antlrcpp::Any CodeGenVisitor::visitWhileStmt(AslParser::WhileStmtContext *ctx) {
+  DEBUG_ENTER();
+  CodeAttribs && codAtsE = visit(ctx->expr());
+  std::string          addrCond = codAtsE.addr;          //address of while condition
+  instructionList &    codeCond = codAtsE.code;          //code of while condition
+  instructionList && stmtsCode = visit(ctx->statements()); //do statements code
+
+  std::string label = codeCounters.newLabelWHILE();
+  std::string labelWhile = "while" + label;
+  std::string labelEndWhile = "endwhile" + label;
+
+  instructionList && code = instruction::LABEL(labelWhile) || codeCond || instruction::FJUMP(addrCond,labelEndWhile) 
+                            || stmtsCode || instruction::UJUMP(labelWhile) || instruction::LABEL(labelEndWhile);
+
+  DEBUG_EXIT();
+  return code;
+}
+
 antlrcpp::Any CodeGenVisitor::visitProcCall(AslParser::ProcCallContext *ctx) {
   DEBUG_ENTER();
   instructionList code;
@@ -213,7 +231,7 @@ antlrcpp::Any CodeGenVisitor::visitWriteExpr(AslParser::WriteExprContext *ctx) {
   else if (Types.isIntegerTy(t1) or Types.isBooleanTy(t1)) code = code1 || instruction::WRITEI(addr1);
   // character
   else code = code1 || instruction::WRITEC(addr1);
-  
+
   DEBUG_EXIT();
   return code;
 }
