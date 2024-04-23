@@ -84,6 +84,7 @@ public:
 
   antlrcpp::Any visitLogical(AslParser::LogicalContext *ctx);
 
+  std::string coerceTypes(instructionList & code, const TypesMgr::TypeId t1, const TypesMgr::TypeId t2, const std::string t1Addr);
 
 
   antlrcpp::Any visitNone(AslParser::NoneContext *ctx);
