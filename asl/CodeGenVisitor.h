@@ -83,9 +83,13 @@ public:
   antlrcpp::Any visitValue(AslParser::ValueContext *ctx);
   antlrcpp::Any visitIdent(AslParser::IdentContext *ctx);
 
+  antlrcpp::Any visitFunctionCall(AslParser::FunctionCallContext *ctx);
+  antlrcpp::Any visitFunc_params(AslParser::Func_paramsContext *ctx);
   antlrcpp::Any visitLogical(AslParser::LogicalContext *ctx);
 
   std::string coerceTypes(instructionList & code, const TypesMgr::TypeId t1, const TypesMgr::TypeId t2, const std::string t1Addr);
+  
+  TypesMgr::TypeId stringToTypeId(std::string type);
 
 
   antlrcpp::Any visitNone(AslParser::NoneContext *ctx);

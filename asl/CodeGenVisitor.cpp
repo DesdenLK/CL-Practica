@@ -85,16 +85,45 @@ antlrcpp::Any CodeGenVisitor::visitFunction(AslParser::FunctionContext *ctx) {
   Symbols.pushThisScope(sc);
   subroutine subr(ctx->ID()->getText());
   codeCounters.reset();
+
+  std::vector<var> && lparams = visit(ctx -> func_params());
+  for (auto & oneparam: lparams) {
+    bool array = Types.isArrayTy(stringToTypeId(oneparam.type));
+    subr.add_param(oneparam.name, oneparam.type, array);
+  }
+
+  if (ctx -> basic_type()) {
+    TypesMgr::TypeId t1 = getTypeDecor(ctx -> basic_type());
+    subr.add_param("_result", Types.to_string(t1));
+  }
   std::vector<var> && lvars = visit(ctx->declarations());
   for (auto & onevar : lvars) {
     subr.add_var(onevar);
   }
   instructionList && code = visit(ctx->statements());
+
   code = code || instruction(instruction::RETURN());
   subr.set_instructions(code);
   Symbols.popScope();
   DEBUG_EXIT();
   return subr;
+}
+
+antlrcpp::Any CodeGenVisitor::visitFunc_params(AslParser::Func_paramsContext *ctx) {
+  DEBUG_ENTER();
+  std::vector<var> lvars;
+  for (uint i = 0; i < ctx -> ID().size(); ++i) {
+    TypesMgr::TypeId   t1 = getTypeDecor(ctx->type(i));
+    lvars.push_back(var{ctx -> ID(i) -> getText(), Types.to_string(t1)});
+  }
+  DEBUG_EXIT();
+  return lvars;
+}
+
+antlrcpp::Any CodeGenVisitor::visitFunctionCall(AslParser::FunctionCallContext *ctx) {
+  DEBUG_ENTER();
+  DEBUG_EXIT();
+  return 0;
 }
 
 antlrcpp::Any CodeGenVisitor::visitDeclarations(AslParser::DeclarationsContext *ctx) {
@@ -444,6 +473,16 @@ antlrcpp::Any CodeGenVisitor::visitNone(AslParser::NoneContext *ctx) {
   CodeAttribs && codAts = visit(ctx->expr());
   DEBUG_EXIT();
   return codAts;
+}
+
+TypesMgr::TypeId CodeGenVisitor::stringToTypeId(std::string type) {
+  if (type == "integer") return Types.createIntegerTy();
+  else if (type == "bool") return Types.createBooleanTy();
+  else if (type == "float") return Types.createFloatTy();
+  else if (type == "character") return Types.createCharacterTy();
+  else if (type == "bool") return Types.createBooleanTy();
+  else if (type == "error") return Types.createErrorTy();
+  else return Types.createArrayTy(0, Types.createIntegerTy());
 }
 
 
