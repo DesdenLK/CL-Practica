@@ -87,6 +87,8 @@ public:
   antlrcpp::Any visitFunc_params(AslParser::Func_paramsContext *ctx);
   antlrcpp::Any visitLogical(AslParser::LogicalContext *ctx);
 
+  antlrcpp::Any visitReturnStmt(AslParser::ReturnStmtContext *ctx);
+
   std::string coerceTypes(instructionList & code, const TypesMgr::TypeId t1, const TypesMgr::TypeId t2, const std::string t1Addr);
   
   TypesMgr::TypeId stringToTypeId(std::string type);
