@@ -198,6 +198,21 @@ antlrcpp::Any CodeGenVisitor::visitVariable_decl(AslParser::Variable_declContext
   return lvars;
 }
 
+/* antlrcpp::Any CodeGenVistor::visitArrayElement(AslParser::ArrayElementContext *ctx) {
+  instructionList code;
+
+  CodeAttribs && codAts = visit(ctx->ident());
+  std::string addrIdent = codAts.addr;
+  instructionList & codeIdent = codAts.code;
+
+  CodeAttribs && codAts1 = visit(ctx->expr());
+  std::string addrExpr = codAts.addr;
+  instructionList & codeExpr = codAts.code;
+
+  
+}
+*/
+
 antlrcpp::Any CodeGenVisitor::visitStatements(AslParser::StatementsContext *ctx) {
   DEBUG_ENTER();
   instructionList code;
@@ -211,18 +226,53 @@ antlrcpp::Any CodeGenVisitor::visitStatements(AslParser::StatementsContext *ctx)
 
 antlrcpp::Any CodeGenVisitor::visitAssignStmt(AslParser::AssignStmtContext *ctx) {
   DEBUG_ENTER();
-  instructionList code;
   CodeAttribs     && codAtsE1 = visit(ctx->left_expr());
   std::string           addr1 = codAtsE1.addr;
-  // std::string           offs1 = codAtsE1.offs;
+  std::string           offs1 = codAtsE1.offs;
   instructionList &     code1 = codAtsE1.code;
-  // TypesMgr::TypeId tid1 = getTypeDecor(ctx->left_expr());
+  TypesMgr::TypeId tid1 = getTypeDecor(ctx->left_expr());
   CodeAttribs     && codAtsE2 = visit(ctx->expr());
   std::string           addr2 = codAtsE2.addr;
-  // std::string           offs2 = codAtsE2.offs;
+  std::string           offs2 = codAtsE2.offs;
   instructionList &     code2 = codAtsE2.code;
-  // TypesMgr::TypeId tid2 = getTypeDecor(ctx->expr());
-  code = code1 || code2 || instruction::LOAD(addr1, addr2);
+  TypesMgr::TypeId tid2 = getTypeDecor(ctx->expr());
+
+  instructionList code = code1 || code2;
+
+  std::address = coerceTypes(code,tid1,tid2,addr2);
+
+  // adaptar codegen de left_expr per accessos a arrays i visitArrayAccess
+
+  // copyArrayCode(leftExpressionType,expressionType,leftExpression.addr,address)
+
+  if (Types.isArrayTy(tid1) and Types.isArrayTy(tid2)) {
+    TypesMgr::TypeId elemTypeT1 = Types.getArrayElemType(tid1);
+    TypesMgr::TypeId elemTypeT2 = Types.getArrayElemType(tid2);
+    unsigned int sizeElemT1 = Types.getSizeOfType(elemTypeT1);
+    unsigned int sizeElemT2 = Types.getSizeOfType(elemTypeT2);
+
+    std::string t1offset = "%" + codeCounters.newTEMP();
+    std::string addrT2elem = "%" + codeCounters.newTEMP();
+    
+    code = code || instruction::MUL(addrT2elem,offs2,std::to_string(sizeElemT2)) || instruction::LOADX(addrT2elem,addr2,addrT2elem)
+          || instruction::MUL(t1offset,offs1,std::to_string(sizeElemT1)) || instruction::XLOAD(addr1,t1offset,addrT2elem);
+  } 
+
+  else if (Types.isArrayTy(tid1)) {
+    TypesMgr::TypeId elemTypeT1 = Types.getArrayElemType(tid1);
+    unsigned int sizeElemT1 = Types.getSizeOfType(elemTypeT1);
+    std::string t1offset = "%" + codeCounters.newTEMP();
+    code = code || instruction::MUL(t1offset,offs1,std::to_string(sizeElemT1)) || instruction::XLOAD(addr1,t1offset,addr2);
+  }
+
+  else if (Types.isArrayTy(tid2)) {
+    TypesMgr::TypeId elemTypeT2 = Types.getArrayElemType(tid2);
+    unsigned int sizeElemT2 = Types.getSizeOfType(elemTypeT2);
+    std::string t2offset = "%" + codeCounters.newTEMP();
+    code = code || instruction::MUL(t2offset,offs2,std::to_string(sizeElemT2)) || instruction::LOADX(addr1,addr2,t2offset);
+  }
+
+  else code = code || instruction::LOAD(addr1, addr2);
   DEBUG_EXIT();
   return code;
 }
