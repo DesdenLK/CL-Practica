@@ -368,11 +368,22 @@ antlrcpp::Any CodeGenVisitor::visitReadStmt(AslParser::ReadStmtContext *ctx) {
   DEBUG_ENTER();
   CodeAttribs     && codAtsE = visit(ctx->left_expr());
   std::string          addr1 = codAtsE.addr;
-  // std::string          offs1 = codAtsE.offs;
+  std::string          offset1 = codAtsE.offs;
   instructionList &    code1 = codAtsE.code;
   instructionList &     code = code1;
-  // TypesMgr::TypeId tid1 = getTypeDecor(ctx->left_expr());
-  code = code1 || instruction::READI(addr1);
+  TypesMgr::TypeId tid1 = getTypeDecor(ctx->left_expr());
+
+  // read of an array access
+  if (offset1 != "") {
+    unsigned int arrayElemSize = Types.getSizeOfType(tid1);
+    std::string temp1 = "%" + codeCounters.newTEMP();
+    code = code || instruction::ILOAD(temp1,std::to_string(arrayElemSize)) || instruction::MUL(temp1,offset1,temp1) || instruction::LOADX(temp1,addr1,temp1);
+    addr1 = temp1;
+  }
+  
+  if (Types.isIntegerTy(tid1)) code = code1 || instruction::READI(addr1);
+  else if (Types.isFloatTy(tid1)) code = code1 || instruction::READF(addr1);
+  else code = code1 || instruction::READC(addr1);
   DEBUG_EXIT();
   return code;
 }
