@@ -256,30 +256,40 @@ antlrcpp::Any CodeGenVisitor::visitAssignStmt(AslParser::AssignStmtContext *ctx)
     unsigned int sizeElemT1 = Types.getSizeOfType(tid1);
     unsigned int sizeElemT2 = Types.getSizeOfType(tid2);
 
+    std::string sizeElem2 = "%" + codeCounters.newTEMP();
+    std::string sizeElem1 = "%" + codeCounters.newTEMP();
     std::string tempElem2 = "%" + codeCounters.newTEMP();
     std::string offset1Bytes = "%" + codeCounters.newTEMP();
     
-    code = code || instruction::ILOAD(tempElem2,std::to_string(sizeElemT2)) || instruction::MUL(tempElem2,offs2,tempElem2) || instruction::LOADX(tempElem2,addr2,tempElem2)
-          || instruction::ILOAD(offset1Bytes,std::to_string(sizeElemT1)) || instruction::MUL(offset1Bytes,offs1,offset1Bytes) || instruction::XLOAD(addr1,offset1Bytes,tempElem2);
+    code = code || instruction::ILOAD(sizeElem2,std::to_string(sizeElemT2)) || instruction::MUL(tempElem2,offs2,sizeElem2) || instruction::LOADX(tempElem2,addr2,tempElem2)
+          || instruction::ILOAD(sizeElem1,std::to_string(sizeElemT1)) || instruction::MUL(offset1Bytes,offs1,sizeElem1) || instruction::XLOAD(addr1,offset1Bytes,tempElem2);
+  }
+  else {
+    if (Types.isFloatTy(tid1) and Types.isIntegerTy(tid2)) {
+      std::string tempParam = "%" + codeCounters.newTEMP();
+      code = code || instruction::FLOAT(tempParam, addr2);
+      addr2 = tempParam;
+    }
+    if (isArrayLeftExpr) {
+      unsigned int sizeElemT1 = Types.getSizeOfType(tid1);
+      std::string t1offset = "%" + codeCounters.newTEMP();
+      std::string sizeElemT1Temp = "%" + codeCounters.newTEMP();
+
+      code = code || instruction::ILOAD(sizeElemT1Temp,std::to_string(sizeElemT1)) || instruction::MUL(t1offset,offs1,sizeElemT1Temp) || instruction::XLOAD(addr1,t1offset,addr2);
+    }
+
+    else if (isArrayExpr) {
+      unsigned int sizeElemT2 = Types.getSizeOfType(tid2);
+      std::string tempArrOffset = "%" + codeCounters.newTEMP();
+      std::string sizeElemTemp = "%" + codeCounters.newTEMP();
+      code = code || instruction::ILOAD(sizeElemTemp,std::to_string(sizeElemT2)) || instruction::MUL(tempArrOffset,offs2,sizeElemTemp) || instruction::LOADX(addr1,addr2,tempArrOffset);
+    }
+
+    else  {
+      code = code || instruction::LOAD(addr1, addr2);
+    }
   } 
 
-  else if (isArrayLeftExpr) {
-    unsigned int sizeElemT1 = Types.getSizeOfType(tid1);
-    std::string t1offset = "%" + codeCounters.newTEMP();
-    std::string sizeElemT1Temp = "%" + codeCounters.newTEMP();
-
-    code = code || instruction::ILOAD(sizeElemT1Temp,std::to_string(sizeElemT1)) || instruction::MUL(t1offset,offs1,sizeElemT1Temp) || instruction::XLOAD(addr1,t1offset,addr2);
-  }
-
-  else if (isArrayExpr) {
-    unsigned int sizeElemT2 = Types.getSizeOfType(tid2);
-    std::string tempArrOffset = "%" + codeCounters.newTEMP();
-    code = code || instruction::ILOAD(tempArrOffset,std::to_string(sizeElemT2)) || instruction::MUL(tempArrOffset,offs2,tempArrOffset) || instruction::LOADX(addr1,addr2,tempArrOffset);
-  }
-
-  else  {
-    code = code || instruction::LOAD(addr1, addr2);
-  }
   
   DEBUG_EXIT();
   return code;
@@ -335,6 +345,9 @@ antlrcpp::Any CodeGenVisitor::visitProcCall(AslParser::ProcCallContext *ctx) {
   instructionList paramsPush;
   instructionList paramsPop;
 
+  TypesMgr::TypeId tFunc= getTypeDecor(ctx -> ident());
+  TypesMgr::TypeId tRet = Types.getFuncReturnType(tFunc);
+
   auto typesParams = Types.getFuncParamsTypes(getTypeDecor(ctx -> ident()));
 
   for (uint i = 0; i < ctx -> expr().size(); ++i){
@@ -355,6 +368,10 @@ antlrcpp::Any CodeGenVisitor::visitProcCall(AslParser::ProcCallContext *ctx) {
     paramsPop = paramsPop || instruction::POP();
 
   }
+  if (not Types.isVoidTy(tRet)) {
+    paramsPush = instruction::PUSH() || paramsPush;
+    paramsPop = paramsPop || instruction::POP();
+  }
 
   code = code || paramsPush;
   code = code || instruction::CALL(ctx -> ident() -> getText());
@@ -373,17 +390,21 @@ antlrcpp::Any CodeGenVisitor::visitReadStmt(AslParser::ReadStmtContext *ctx) {
   instructionList &     code = code1;
   TypesMgr::TypeId tid1 = getTypeDecor(ctx->left_expr());
 
+
+  bool isArray = ctx -> left_expr() -> expr();
+  std:: string temp = isArray ? "%" + codeCounters.newTEMP() : addr1;
   // read of an array access
-  if (offset1 != "") {
+  
+  if (Types.isIntegerTy(tid1) or Types.isBooleanTy(tid1)) code = code1 || instruction::READI(temp);
+  else if (Types.isFloatTy(tid1)) code = code1 || instruction::READF(temp);
+  else code = code1 || instruction::READC(temp);
+
+    if (isArray) {
     unsigned int arrayElemSize = Types.getSizeOfType(tid1);
     std::string temp1 = "%" + codeCounters.newTEMP();
-    code = code || instruction::ILOAD(temp1,std::to_string(arrayElemSize)) || instruction::MUL(temp1,offset1,temp1) || instruction::LOADX(temp1,addr1,temp1);
+    code = code || instruction::ILOAD(temp1,std::to_string(arrayElemSize)) || instruction::MUL(temp1,offset1,temp1) || instruction::XLOAD(addr1,offset1,temp);
     addr1 = temp1;
   }
-  
-  if (Types.isIntegerTy(tid1)) code = code1 || instruction::READI(addr1);
-  else if (Types.isFloatTy(tid1)) code = code1 || instruction::READF(addr1);
-  else code = code1 || instruction::READC(addr1);
   DEBUG_EXIT();
   return code;
 }
@@ -453,8 +474,9 @@ antlrcpp::Any CodeGenVisitor::visitArithmetic(AslParser::ArithmeticContext *ctx)
   // if 1st expression is an array access
   if (offset1 != "") {
     unsigned int arrayElemSize = Types.getSizeOfType(t1);
+    std::string ElemSizeTemp = "%" + codeCounters.newTEMP();
     std::string temp1 = "%" + codeCounters.newTEMP();
-    code1 = code1 || instruction::ILOAD(temp1,std::to_string(arrayElemSize)) || instruction::MUL(temp1,offset1,temp1) || instruction::LOADX(temp1,addr1,temp1);
+    code1 = code1 || instruction::ILOAD(ElemSizeTemp,std::to_string(arrayElemSize)) || instruction::MUL(temp1,offset1,ElemSizeTemp) || instruction::LOADX(temp1,addr1,temp1);
     addr1 = temp1;
   }
   
@@ -469,8 +491,9 @@ antlrcpp::Any CodeGenVisitor::visitArithmetic(AslParser::ArithmeticContext *ctx)
     // if 2nd expression is an array access
     if (offset2 != "") {
       unsigned int arrayElemSize = Types.getSizeOfType(t2);
+      std::string ElemSizeTemp = "%" + codeCounters.newTEMP();
       std::string temp2 = "%" + codeCounters.newTEMP();
-      code = code || instruction::ILOAD(temp2,std::to_string(arrayElemSize)) || instruction::MUL(temp2,offset2,temp2) || instruction::LOADX(temp2,addr2,temp2);
+      code = code || instruction::ILOAD(ElemSizeTemp,std::to_string(arrayElemSize)) || instruction::MUL(temp2,offset2,ElemSizeTemp) || instruction::LOADX(temp2,addr2,temp2);
       addr2 = temp2;
     }
 
