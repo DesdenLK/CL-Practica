@@ -192,9 +192,12 @@ antlrcpp::Any CodeGenVisitor::visitVariable_decl(AslParser::Variable_declContext
   TypesMgr::TypeId   t1 = getTypeDecor(ctx->type());
   std::size_t      size = Types.getSizeOfType(t1);
   for (auto varID : ctx->ID()) {
-    //std::string typeText = ctx->type()->getText();
-    //if (typeText.find("array") != std::string::npos) lvars.push_back(var{varID->getText(), Types.to_string(t1) + " " + "10", size});
-    lvars.push_back(var{varID->getText(), Types.to_string(t1), size});
+    std::string typeText = ctx->type()->getText();
+    if (typeText.find("array") != std::string::npos) {
+      TypesMgr::TypeId t2 = Types.getArrayElemType(t1);
+      lvars.push_back(var{varID->getText(), Types.to_string(t2), size});
+    }
+    else lvars.push_back(var{varID->getText(), Types.to_string(t1), size});
   }
   DEBUG_EXIT();
   return lvars;
