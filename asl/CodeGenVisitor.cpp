@@ -94,7 +94,7 @@ antlrcpp::Any CodeGenVisitor::visitFunction(AslParser::FunctionContext *ctx) {
 
   std::vector<var> && lparams = visit(ctx -> func_params());
   for (auto & oneparam: lparams) {
-    bool array = Types.isArrayTy(stringToTypeId(oneparam.type));
+    bool array = oneparam.nelem != 1;
     subr.add_param(oneparam.name, oneparam.type, array);
   }
   std::vector<var> && lvars = visit(ctx->declarations());
@@ -129,7 +129,12 @@ antlrcpp::Any CodeGenVisitor::visitFunc_params(AslParser::Func_paramsContext *ct
   std::vector<var> lvars;
   for (uint i = 0; i < ctx -> ID().size(); ++i) {
     TypesMgr::TypeId   t1 = getTypeDecor(ctx->type(i));
-    lvars.push_back(var{ctx -> ID(i) -> getText(), Types.to_string(t1)});
+    if (Types.isArrayTy(t1)) {
+      std::size_t      size = Types.getSizeOfType(t1);
+      TypesMgr::TypeId t2 = Types.getArrayElemType(t1);
+      lvars.push_back(var{ctx -> ID(i) ->getText(), Types.to_string(t2), size});
+    }
+    else lvars.push_back(var{ctx -> ID(i) -> getText(), Types.to_string(t1)});
   }
   DEBUG_EXIT();
   return lvars;
@@ -155,6 +160,10 @@ antlrcpp::Any CodeGenVisitor::visitFunctionCall(AslParser::FunctionCallContext *
     if (Types.isFloatTy(typesParams[i]) and Types.isIntegerTy(tParam)) {
       tempParam = "%" + codeCounters.newTEMP();
       code = code || instruction::FLOAT(tempParam, addrParam);
+    }
+    else if (Types.isArrayTy(tParam)) {
+      tempParam = "%" + codeCounters.newTEMP();
+      code = code || instruction::ALOAD(tempParam,addrParam);
     }
 
     paramsPush = paramsPush || instruction::PUSH(tempParam);
@@ -362,6 +371,10 @@ antlrcpp::Any CodeGenVisitor::visitProcCall(AslParser::ProcCallContext *ctx) {
     if (Types.isFloatTy(typesParams[i]) and Types.isIntegerTy(tParam)) {
       tempParam = "%" + codeCounters.newTEMP();
       code = code || instruction::FLOAT(tempParam, addrParam);
+    }
+    else if (Types.isArrayTy(tParam)) {
+      tempParam = "%" + codeCounters.newTEMP();
+      code = code || instruction::ALOAD(tempParam,addrParam);
     }
 
     paramsPush = paramsPush || instruction::PUSH(tempParam);
@@ -686,7 +699,15 @@ antlrcpp::Any CodeGenVisitor::visitExprIdent(AslParser::ExprIdentContext *ctx) {
 
 antlrcpp::Any CodeGenVisitor::visitIdent(AslParser::IdentContext *ctx) {
   DEBUG_ENTER();
-  CodeAttribs codAts(ctx->ID()->getText(), "", instructionList());
+  instructionList code;
+  std::string name = ctx -> ID() -> getText();
+  TypesMgr::TypeId type = Symbols.getType(name);
+  if (Symbols.isParameterClass(name) and Types.isArrayTy(type)) {
+    std::string address = "%" + codeCounters.newTEMP();
+    code = code || instruction::LOAD(address, name);
+    name = address;
+  }
+  CodeAttribs codAts(name, "", code);
   DEBUG_EXIT();
   return codAts;
 }
