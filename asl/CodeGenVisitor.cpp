@@ -536,6 +536,9 @@ antlrcpp::Any CodeGenVisitor::visitArithmetic(AslParser::ArithmeticContext *ctx)
       else if (ctx -> DIV()) {
         code = code || instruction::DIV(temp, addr1, addr2);
       }
+      else if (ctx -> MOD()) {
+        code = code || instruction::DIV(temp, addr1, addr2) || instruction::MUL(temp, addr2, temp) || instruction::SUB(temp, addr1, temp);
+      }
       else {
         code = code || instruction::ADD(temp, addr1, addr2);
       }
