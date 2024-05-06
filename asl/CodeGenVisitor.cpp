@@ -258,10 +258,37 @@ antlrcpp::Any CodeGenVisitor::visitAssignStmt(AslParser::AssignStmtContext *ctx)
 
   instructionList code = code1 || code2;
 
-  bool isArrayLeftExpr = ctx->left_expr()->expr() != NULL;
-  bool isArrayExpr = offs2 != "";
+  bool isArrayAccessLeftExpr = ctx->left_expr()->expr() != NULL;
+  bool isArrayAccessExpr = offs2 != "";
 
-  if (isArrayLeftExpr and isArrayExpr) {
+  // case of copying array to array i.e. a=b
+  if (Types.isArrayTy(tid1) and Types.isArrayTy(tid2)) {
+    unsigned int arraySize = Types.getArraySize(tid2);
+    unsigned int sizeElemT1 = Types.getSizeOfType(Types.getArrayElemType(tid1));
+    unsigned int sizeElemT2 = Types.getSizeOfType(Types.getArrayElemType(tid2));
+
+    std::string sizeElem2 = "%" + codeCounters.newTEMP();
+    std::string sizeElem1 = "%" + codeCounters.newTEMP();
+    std::string tempElem2 = "%" + codeCounters.newTEMP();
+    std::string offset1Bytes = "%" + codeCounters.newTEMP();
+    std::string label = codeCounters.newLabelWHILE();
+    std::string labelWhile = "while" + label;
+    std::string labelEndWhile = "endwhile" + label;
+
+    std::string tempIndex = "%" + codeCounters.newTEMP();
+    std::string tempVal = "%" + codeCounters.newTEMP();
+    std::string condition = "%" + codeCounters.newTEMP();
+
+    // while i < arraySize a[i]=b[i]
+    code = code || instruction::ILOAD(tempIndex,"0") || instruction::LABEL(labelWhile) || instruction::ILOAD(tempVal,std::to_string(arraySize)) 
+                || instruction::LT(condition,tempIndex,tempVal) || instruction::FJUMP(condition,labelEndWhile) 
+                || instruction::ILOAD(sizeElem2,std::to_string(sizeElemT2)) || instruction::MUL(tempElem2,tempIndex,sizeElem2)
+                || instruction::LOADX(tempElem2,addr2,tempElem2) || instruction::ILOAD(sizeElem1,std::to_string(sizeElemT1))
+                || instruction::MUL(offset1Bytes,tempIndex,sizeElem1) || instruction::XLOAD(addr1,offset1Bytes,tempElem2) || instruction::ILOAD(tempVal,"1")
+                || instruction::ADD(tempIndex,tempIndex,tempVal) || instruction::UJUMP(labelWhile) || instruction::LABEL(labelEndWhile);
+  }
+
+  else if (isArrayAccessLeftExpr and isArrayAccessExpr) {
     unsigned int sizeElemT1 = Types.getSizeOfType(tid1);
     unsigned int sizeElemT2 = Types.getSizeOfType(tid2);
 
@@ -279,7 +306,7 @@ antlrcpp::Any CodeGenVisitor::visitAssignStmt(AslParser::AssignStmtContext *ctx)
       code = code || instruction::FLOAT(tempParam, addr2);
       addr2 = tempParam;
     }
-    if (isArrayLeftExpr) {
+    if (isArrayAccessLeftExpr) {
       unsigned int sizeElemT1 = Types.getSizeOfType(tid1);
       std::string t1offset = "%" + codeCounters.newTEMP();
       std::string sizeElemT1Temp = "%" + codeCounters.newTEMP();
@@ -287,7 +314,7 @@ antlrcpp::Any CodeGenVisitor::visitAssignStmt(AslParser::AssignStmtContext *ctx)
       code = code || instruction::ILOAD(sizeElemT1Temp,std::to_string(sizeElemT1)) || instruction::MUL(t1offset,offs1,sizeElemT1Temp) || instruction::XLOAD(addr1,t1offset,addr2);
     }
 
-    else if (isArrayExpr) {
+    else if (isArrayAccessExpr) {
       unsigned int sizeElemT2 = Types.getSizeOfType(tid2);
       std::string tempArrOffset = "%" + codeCounters.newTEMP();
       std::string sizeElemTemp = "%" + codeCounters.newTEMP();
