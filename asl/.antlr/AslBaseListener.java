@@ -1,4 +1,4 @@
-// Generated from /home/luca/Documents/UPC/3r_Q1_2023-2024/CL/CL-Practica/asl/Asl.g4 by ANTLR 4.13.1
+// Generated from /home/luca/Documents/UPC/3r_Q2_2023-2024/CL/CL-Practica/asl/Asl.g4 by ANTLR 4.13.1
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -83,6 +83,18 @@ public class AslBaseListener implements AslListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitType(AslParser.TypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterBasic_type(AslParser.Basic_typeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBasic_type(AslParser.Basic_typeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -215,6 +227,30 @@ public class AslBaseListener implements AslListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitLeft_expr(AslParser.Left_exprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterArrayElement(AslParser.ArrayElementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitArrayElement(AslParser.ArrayElementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFunctionCall(AslParser.FunctionCallContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFunctionCall(AslParser.FunctionCallContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

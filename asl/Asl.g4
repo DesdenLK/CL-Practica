@@ -101,7 +101,7 @@ expr    : LPAR expr RPAR                       # none
         | ident LSBRACKET expr RSBRACKET      #arrayElement
         | ident LPAR (expr (',' expr)*)? RPAR                     #functionCall
         | op=NOT expr                         #logical
-        | op=MINUS expr                       # arithmetic
+        | op=(MINUS|PLUS) expr                       # arithmetic
         | expr op=(MUL|DIV|MOD) expr              # arithmetic
         | expr op=(PLUS|MINUS) expr           # arithmetic
         | expr op=(EQUAL|NEQ|G|L|GE|LE) expr  # relational

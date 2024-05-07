@@ -1,4 +1,4 @@
-// Generated from /home/luca/Documents/UPC/3r_Q1_2023-2024/CL/CL-Practica/asl/Asl.g4 by ANTLR 4.13.1
+// Generated from /home/luca/Documents/UPC/3r_Q2_2023-2024/CL/CL-Practica/asl/Asl.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -66,6 +66,16 @@ public interface AslListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitType(AslParser.TypeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AslParser#basic_type}.
+	 * @param ctx the parse tree
+	 */
+	void enterBasic_type(AslParser.Basic_typeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AslParser#basic_type}.
+	 * @param ctx the parse tree
+	 */
+	void exitBasic_type(AslParser.Basic_typeContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link AslParser#datastrucure_decl}.
 	 * @param ctx the parse tree
@@ -192,6 +202,30 @@ public interface AslListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitLeft_expr(AslParser.Left_exprContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code arrayElement}
+	 * labeled alternative in {@link AslParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterArrayElement(AslParser.ArrayElementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code arrayElement}
+	 * labeled alternative in {@link AslParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitArrayElement(AslParser.ArrayElementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code functionCall}
+	 * labeled alternative in {@link AslParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunctionCall(AslParser.FunctionCallContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code functionCall}
+	 * labeled alternative in {@link AslParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunctionCall(AslParser.FunctionCallContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code arithmetic}
 	 * labeled alternative in {@link AslParser#expr}.
